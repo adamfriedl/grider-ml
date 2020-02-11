@@ -6,20 +6,16 @@ const LinearRegression = require('./linear-regression');
 let { features, labels, testFeatures, testLabels } = loadCSV('./cars.csv', {
   shuffle: true,
   splitTest: 50,
-  dataColumns: ['horsepower'],
+  dataColumns: ['horsepower', 'weight', 'displacement'],
   labelColumns: ['mpg'],
 });
 
 const regression = new LinearRegression(features, labels, {
-  learningRate: 0.0001,
+  learningRate: 10,
   iterations: 100,
 });
 
 regression.train();
+const r2 = regression.test(testFeatures, testLabels);
 
-console.log(
-  'Updated M is:',
-  regression.weights.get(1, 0),
-  'Updated B is:',
-  regression.weights.get(0, 0)
-);
+console.log(`r2 is ${r2}`);

@@ -1,38 +1,28 @@
 require('@tensorflow/tfjs-node');
 const tf = require('@tensorflow/tfjs');
 const loadCSV = require('../load-csv');
-const LinearRegression = require('./linear-regression');
-const plot = require('node-remote-plot');
+const LogisticRegression = require('./logistic-regression');
 
-let { features, labels, testFeatures, testLabels } = loadCSV(
+const { features, labels, testFeatures, testLabels } = loadCSV(
   '../data/cars.csv',
   {
+    dataColumns: ['horsepower', 'displacement', 'weight'],
+    labelColumns: ['passedemissions'],
     shuffle: true,
     splitTest: 50,
-    dataColumns: ['horsepower', 'weight', 'displacement'],
-    labelColumns: ['mpg'],
+    converters: {
+      passedemissions: value => {
+        return value === 'TRUE' ? 1 : 0;
+      },
+    },
   }
 );
 
-const regression = new LinearRegression(features, labels, {
-  learningRate: 0.1,
-  iterations: 3,
-  batchSize: 10,
+const regression = new LogisticRegression(features, labels, {
+  learningRate: 0.5,
+  iterations: 100,
+  batchSize: 50,
 });
 
 regression.train();
-const r2 = regression.test(testFeatures, testLabels);
-
-plot({
-  x: regression.mseHistory.reverse(),
-  xLabel: 'Iteration #',
-  yLabel: 'MSE',
-});
-console.log(`r2 is ${r2}`);
-
-regression
-  .predict([
-    [120, 2, 380],
-    [135, 2.1, 420],
-  ])
-  .print();
+regression.predict([[88, 97, 1.065]]).print();

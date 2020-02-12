@@ -1,7 +1,7 @@
 const tf = require('@tensorflow/tfjs');
 const _ = require('lodash');
 
-class LinearRegression {
+class LogisticRegression {
   constructor(features, labels, options) {
     this.features = this.processFeatures(features);
     this.labels = tf.tensor(labels);
@@ -16,7 +16,7 @@ class LinearRegression {
   }
 
   gradientDescent(features, labels) {
-    const currentGuesses = features.matMul(this.weights);
+    const currentGuesses = features.matMul(this.weights).sigmoid();
     const differences = currentGuesses.sub(labels);
 
     const slopes = features
@@ -52,7 +52,9 @@ class LinearRegression {
   }
 
   predict(observations) {
-    return this.processFeatures(observations).matMul(this.weights);
+    return this.processFeatures(observations)
+      .matMul(this.weights)
+      .sigmoid();
   }
 
   test(testFeatures, testLabels) {
@@ -124,4 +126,4 @@ class LinearRegression {
   }
 }
 
-module.exports = LinearRegression;
+module.exports = LogisticRegression;
